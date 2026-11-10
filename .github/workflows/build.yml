@@ -1,0 +1,32 @@
+name: Build & Test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen xcbeautify
+
+      - name: Generate project
+        run: xcodegen generate
+
+      - name: Resolve packages
+        run: xcodebuild -resolvePackageDependencies -project Cabin.xcodeproj -scheme Cabin
+
+      - name: Build and test
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project Cabin.xcodeproj -scheme Cabin \
+            -destination 'platform=macOS,arch=arm64' \
+            -skipPackagePluginValidation -skipMacroValidation \
+            CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO \
+            | xcbeautify --renderer github-actions

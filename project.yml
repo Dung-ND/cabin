@@ -1,0 +1,77 @@
+name: Cabin
+options:
+  bundleIdPrefix: com.cabin
+  deploymentTarget:
+    macOS: "14.2"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MACOSX_DEPLOYMENT_TARGET: "14.2"
+    ENABLE_HARDENED_RUNTIME: YES
+    DEAD_CODE_STRIPPING: YES
+packages:
+  ArgmaxOSS:
+    url: https://github.com/argmaxinc/argmax-oss-swift.git
+    from: "1.1.1"
+  GRDB:
+    url: https://github.com/groue/GRDB.swift.git
+    from: "7.12.0"
+targets:
+  Cabin:
+    type: application
+    platform: macOS
+    sources:
+      - path: Cabin
+    info:
+      path: Cabin/Info.plist
+      properties:
+        CFBundleDisplayName: Cabin
+        CFBundleShortVersionString: "0.1.0"
+        CFBundleVersion: "1"
+        LSUIElement: true
+        LSApplicationCategoryType: public.app-category.productivity
+        NSMicrophoneUsageDescription: Cabin transcribes your voice so it can include you in live transcripts and summaries.
+        NSAudioCaptureUsageDescription: Cabin listens to audio playing on this Mac to transcribe and summarize it.
+        NSScreenCaptureUsageDescription: Cabin uses system audio capture (part of Screen & System Audio Recording) to hear audio from your apps.
+    entitlements:
+      path: Cabin/Cabin.entitlements
+      properties:
+        com.apple.security.app-sandbox: false
+        com.apple.security.device.audio-input: true
+        com.apple.security.network.client: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.cabin.app
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: "-"
+        GENERATE_INFOPLIST_FILE: NO
+    dependencies:
+      - package: ArgmaxOSS
+        product: WhisperKit
+      - package: ArgmaxOSS
+        product: SpeakerKit
+      - package: GRDB
+        product: GRDB
+  CabinTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: CabinTests
+    dependencies:
+      - target: Cabin
+    settings:
+      base:
+        BUNDLE_LOADER: "$(TEST_HOST)"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Cabin.app/Contents/MacOS/Cabin"
+        CODE_SIGN_IDENTITY: "-"
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  Cabin:
+    build:
+      targets:
+        Cabin: all
+        CabinTests: [test]
+    test:
+      targets:
+        - CabinTests
