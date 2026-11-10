@@ -61,19 +61,19 @@ final class Summarizer {
     }
 
     static func pieces(_ lines: [TranscriptLine], maxChars: Int) -> [(text: String, lastId: Int64)] {
-        var out: [(String, Int64)] = []
+        var out: [(text: String, lastId: Int64)] = []
         var current = ""
         var lastId: Int64 = 0
         for line in lines {
             let f = format(line)
             if !current.isEmpty, current.count + f.count > maxChars {
-                out.append((current, lastId))
+                out.append((text: current, lastId: lastId))
                 current = ""
             }
             current += f + "\n"
             lastId = line.id
         }
-        if !current.isEmpty { out.append((current, lastId)) }
+        if !current.isEmpty { out.append((text: current, lastId: lastId)) }
         return out
     }
 

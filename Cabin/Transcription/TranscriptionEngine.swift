@@ -76,7 +76,7 @@ actor TranscriptionEngine {
         if diarize, chunk.source == .system, chunk.duration >= 2, let speakerKit {
             do {
                 let diarization = try await speakerKit.diarize(audioArray: chunk.samples)
-                let groups = diarization.addSpeakerInfo(to: results, strategy: .subsegment)
+                let groups = diarization.addSpeakerInfo(to: results)
                 var out: [RecognizedSegment] = []
                 for seg in groups.flatMap({ $0 }) {
                     let text = TextCleaner.clean(seg.text)
