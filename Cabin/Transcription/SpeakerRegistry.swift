@@ -68,9 +68,9 @@ final class SpeakerRegistry {
         return best
     }
 
-    private func createSpeaker(embedding: [Float]) throws -> Int64? {
+    private func createSpeaker(embedding: [Float]) throws -> Int64 {
         let s = try db.insertSpeaker(embedding: embedding)
-        guard let id = s.id else { return nil }
+        guard let id = s.id else { throw DatabaseIDError.missing }
         speakers[id] = (embedding, embedding.isEmpty ? 0 : 1)
         lastSystemSpeaker = id
         return id
@@ -103,3 +103,5 @@ final class SpeakerRegistry {
         return 1 - dot / (na.squareRoot() * nb.squareRoot())
     }
 }
+
+enum DatabaseIDError: Error { case missing }
